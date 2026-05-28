@@ -26,12 +26,12 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/yuechuanai/YCAppStoreMetaKit.git"
+    "url": "git+https://github.com/wangjianqi/YCAppStoreMetaKit.git"
   },
   "bugs": {
-    "url": "https://github.com/yuechuanai/YCAppStoreMetaKit/issues"
+    "url": "https://github.com/wangjianqi/YCAppStoreMetaKit/issues"
   },
-  "homepage": "https://github.com/yuechuanai/YCAppStoreMetaKit#readme",
+  "homepage": "https://github.com/wangjianqi/YCAppStoreMetaKit#readme",
   "files": [
     "bin",
     "src",
