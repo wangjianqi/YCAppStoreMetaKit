@@ -25,6 +25,10 @@ function preparePayload(metadata, validationReport) {
         terms: getLocaleUrl(metadata.config, 'terms', locale),
         support: getLocaleUrl(metadata.config, 'support', locale),
         marketing: getLocaleUrl(metadata.config, 'marketing', locale)
+      },
+      assets: {
+        screenshots: (metadata.assets?.screenshots?.[locale]) || {},
+        videos: (metadata.assets?.videos?.[locale]) || {}
       }
     };
   }
@@ -36,7 +40,8 @@ function preparePayload(metadata, validationReport) {
     locales,
     localeOrder: metadata.configuredLocales,
     validationReport,
-    limits: LIMITS
+    limits: LIMITS,
+    screenshotResolutions: require('../core/schema').SCREENSHOT_RESOLUTIONS
   };
 }
 
@@ -106,6 +111,12 @@ function generateHtml(metadata, validationReport) {
     ul.report { margin: 0; padding-left: 20px; line-height: 1.6; }
     .screenshot { border: 1px solid var(--line); border-radius: 16px; padding: 12px; margin: 10px 0; }
     .screenshot strong { display: block; margin-bottom: 4px; }
+    .media-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 12px; margin: 10px 0; }
+    .media-item { border: 1px solid var(--line); border-radius: 16px; overflow: hidden; background: var(--card); }
+    .media-item img { width: 100%; height: auto; display: block; }
+    .media-item video { width: 100%; height: auto; display: block; background: #000; }
+    .media-item .media-label { padding: 8px 10px; font-size: 12px; color: var(--muted); }
+    .media-set-title { font-weight: 700; margin: 14px 0 6px; font-size: 15px; }
     @media (max-width: 900px) { .app { grid-template-columns: 1fr; } aside { position: relative; height: auto; } .grid { grid-template-columns: 1fr; } .topbar { align-items: flex-start; flex-direction: column; } }
     @media print { aside { display: none; } .app { grid-template-columns: 1fr; } .card { box-shadow: none; border: 1px solid #ccc; } button { display: none; } .value { max-height: none; } }
   </style>
@@ -123,6 +134,7 @@ function generateHtml(metadata, validationReport) {
         <a href="#review">Review Notes</a>
         <a href="#compliance">Compliance Notes</a>
         <a href="#screenshots">Screenshot Copy</a>
+        <a href="#media">Screenshots &amp; Videos</a>
         <a href="#validation">Validation Report</a>
         <a href="#fastlane">Fastlane Export Preview</a>
       </nav>
@@ -141,6 +153,7 @@ function generateHtml(metadata, validationReport) {
       <section id="review"><h2>Review Notes</h2><div class="grid" id="reviewGrid"></div></section>
       <section id="compliance"><h2>Compliance Notes</h2><div class="grid" id="complianceGrid"></div></section>
       <section id="screenshots"><h2>Screenshot Copy</h2><div class="grid" id="screenshotsGrid"></div></section>
+      <section id="media"><h2>Screenshots &amp; Videos</h2><div class="grid" id="mediaGrid"></div></section>
       <section id="validation"><h2>Validation Report</h2><div class="grid" id="validationGrid"></div></section>
       <section id="fastlane"><h2>Fastlane Export Preview</h2><div class="grid" id="fastlaneGrid"></div></section>
     </main>
@@ -197,6 +210,27 @@ function render() {
     const body = (rows || []).map((r, i) => '<div class="screenshot"><strong>' + (i+1) + '. ' + escapeHTML(r.title) + '</strong><span>' + escapeHTML(r.subtitle) + '</span></div>').join('');
     return '<div class="card full"><div class="field-head"><div class="field-title">' + escapeHTML(setName) + '</div></div>' + body + '</div>';
   }).join('') || '<div class="card full">No screenshot copy for this locale.</div>';
+  const assets = item.assets || {};
+  const assetScreenshots = assets.screenshots || {};
+  const assetVideos = assets.videos || {};
+  let mediaHtml = '';
+  const allSetNames = new Set([...Object.keys(assetScreenshots), ...Object.keys(assetVideos)]);
+  if (allSetNames.size === 0) {
+    mediaHtml = '<div class="card full">No screenshot or video files found in assets/. Place images in assets/{locale}/{device_set}/ and videos in assets/{locale}/previews/.</div>';
+  } else {
+    for (const setName of allSetNames) {
+      const imgs = (assetScreenshots[setName] || []).map(p => {
+        const rel = '../assets/' + locale + '/' + setName + '/' + p.split('/').pop();
+        return '<div class="media-item"><img src="' + escapeHTML(rel) + '" loading="lazy" /><div class="media-label">' + escapeHTML(p.split('/').pop()) + '</div></div>';
+      }).join('');
+      const vids = (assetVideos[setName] || []).map(p => {
+        const rel = '../assets/' + locale + '/previews/' + p.split('/').pop();
+        return '<div class="media-item"><video src="' + escapeHTML(rel) + '" controls muted playsinline></video><div class="media-label">' + escapeHTML(p.split('/').pop()) + '</div></div>';
+      }).join('');
+      mediaHtml += '<div class="card full"><div class="media-set-title">' + escapeHTML(setName) + '</div><div class="media-grid">' + imgs + vids + '</div></div>';
+    }
+  }
+  $('mediaGrid').innerHTML = mediaHtml;
   const report = DATA.validationReport || { errors: [], warnings: [], passed: [] };
   $('validationGrid').innerHTML = '<div class="card full"><div class="field-head"><div><span class="status error">Errors ' + report.errors.length + '</span> <span class="status warn">Warnings ' + report.warnings.length + '</span> <span class="status ok">Passed ' + report.passed.length + '</span></div></div>'
     + '<h3>Errors</h3><ul class="report">' + report.errors.map(x => '<li>' + escapeHTML(x.message) + '</li>').join('') + '</ul>'

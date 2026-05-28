@@ -16,6 +16,15 @@ This directory is managed by YCAppStoreMetaKit.
 - locales/*.yaml
 - screenshots/*.yaml
 
+## Media assets
+
+- assets/{locale}/iphone_6_9/  — iPhone 6.9" screenshots (01.png, 02.png, ...)
+- assets/{locale}/ipad_13/     — iPad 13" screenshots
+- assets/{locale}/previews/    — App preview videos (iphone_6_9_01.mp4, ...)
+
+Screenshot naming: {NN}.png or {NN}.jpg (01-based, matching screenshots YAML order)
+Video naming: {device_set}_{NN}.{ext} (e.g. iphone_6_9_01.mp4)
+
 ## Generated files
 
 - generated/index.html
@@ -115,6 +124,11 @@ async function init(options = {}) {
   }
 
   await fs.ensureDir(path.join(dir, 'generated'));
+  await fs.ensureDir(path.join(dir, 'assets'));
+  for (const locale of localeList) {
+    await fs.ensureDir(path.join(dir, 'assets', locale, 'iphone_6_9'));
+    await fs.ensureDir(path.join(dir, 'assets', locale, 'previews'));
+  }
   results.push(await writeFileIfAbsent(path.join(dir, 'README.md'), projectReadme(), { force }));
 
   logger.success('YCAppStoreMetaKit initialized.');

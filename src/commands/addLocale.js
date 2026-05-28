@@ -55,6 +55,10 @@ async function addLocale(locale, options = {}) {
   const localeResult = await writeFileIfAbsent(localeFilePath, localeTemplate, { force });
   const screenshotResult = await writeFileIfAbsent(screenshotFilePath, screenshotTemplate, { force });
 
+  const assetsLocaleDir = path.join(dir, 'assets', locale);
+  await fs.ensureDir(path.join(assetsLocaleDir, 'iphone_6_9'));
+  await fs.ensureDir(path.join(assetsLocaleDir, 'previews'));
+
   logger.success(`Added locale "${locale}".`);
   logger.plain(`- Updated: ${relativeFromCwd(configPath)}`);
   logger.plain(`- ${localeResult.status === 'skipped' ? 'Skipped' : 'Created'}: ${relativeFromCwd(localeFilePath)}`);

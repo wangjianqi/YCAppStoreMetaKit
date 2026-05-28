@@ -60,6 +60,11 @@ AppStoreMetadata/
 ├── screenshots/
 │   ├── en-US.yaml
 │   └── zh-Hans.yaml
+├── assets/
+│   ├── en-US/
+│   │   ├── iphone_6_9/   (screenshot images)
+│   │   └── previews/     (app preview videos)
+│   └── zh-Hans/
 ├── generated/
 └── README.md
 ```

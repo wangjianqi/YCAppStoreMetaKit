@@ -2,6 +2,7 @@ const path = require('path');
 const utf8ByteLength = require('./byteLength');
 const { LIMITS, SCREENSHOT_LIMITS, VALID_PLATFORMS, VALID_SCREENSHOT_SETS, REQUIRED_CONFIG_PATHS, REQUIRED_LOCALE_METADATA_FIELDS } = require('./schema');
 const { getLocaleUrl } = require('./loadMetadata');
+const { validateAssets } = require('./assetValidator');
 
 function get(obj, dotted) {
   return dotted.split('.').reduce((current, key) => current == null ? undefined : current[key], obj);
@@ -189,6 +190,13 @@ function validateMetadata(metadata) {
         }
       }
     }
+  }
+
+  if (metadata.assets) {
+    const assetResult = validateAssets(metadata.assets, metadata.screenshots);
+    result.errors.push(...assetResult.errors);
+    result.warnings.push(...assetResult.warnings);
+    result.passed.push(...assetResult.passed);
   }
 
   result.summary = {

@@ -2,6 +2,7 @@ const fs = require('fs-extra');
 const path = require('path');
 const yaml = require('js-yaml');
 const { requireMetadataDir } = require('./paths');
+const { scanAssets } = require('./assetScanner');
 
 async function loadYamlFile(filePath) {
   try {
@@ -47,6 +48,8 @@ async function loadMetadata(root = process.cwd()) {
     }
   }
 
+  const assets = await scanAssets(dir, configuredLocales);
+
   return {
     root,
     dir,
@@ -56,7 +59,8 @@ async function loadMetadata(root = process.cwd()) {
     screenshots,
     configuredLocales,
     missingLocaleFiles,
-    missingScreenshotFiles
+    missingScreenshotFiles,
+    assets
   };
 }
 

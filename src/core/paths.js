@@ -12,6 +12,18 @@ function generatedDir(root = projectRoot()) {
   return path.join(metadataDir(root), 'generated');
 }
 
+function assetsDir(root = projectRoot()) {
+  return path.join(metadataDir(root), 'assets');
+}
+
+function screenshotAssetsDir(root, locale, setName) {
+  return path.join(assetsDir(root), locale, setName);
+}
+
+function previewAssetsDir(root, locale) {
+  return path.join(assetsDir(root), locale, 'previews');
+}
+
 function templatesDir() {
   return path.join(__dirname, '..', 'templates');
 }
@@ -31,6 +43,9 @@ module.exports = {
   projectRoot,
   metadataDir,
   generatedDir,
+  assetsDir,
+  screenshotAssetsDir,
+  previewAssetsDir,
   templatesDir,
   requireMetadataDir
 };

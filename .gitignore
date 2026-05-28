@@ -6,3 +6,4 @@ Thumbs.db
 *.log
 
 AppStoreMetadata/generated/
+.trae/documents/
