@@ -1,5 +1,7 @@
 # YCAppStoreMetaKit
 
+English | [中文](./README.zh-CN.md)
+
 YCAppStoreMetaKit is a local CLI toolkit for managing Apple App Store metadata inside each iOS/macOS project.
 
 It helps you maintain App Store names, subtitles, promotional text, descriptions, keywords, release notes, legal URLs, review notes, screenshot copy, multi-language metadata, fastlane export files, and AI agent skills.
