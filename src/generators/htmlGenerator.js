@@ -202,11 +202,11 @@ function render() {
     + '<h3>Errors</h3><ul class="report">' + report.errors.map(x => '<li>' + escapeHTML(x.message) + '</li>').join('') + '</ul>'
     + '<h3>Warnings</h3><ul class="report">' + report.warnings.map(x => '<li>' + escapeHTML(x.message) + '</li>').join('') + '</ul>'
     + '</div>';
-  $('fastlaneGrid').innerHTML = '<div class="card full"><div class="value">AppStoreMetadata/generated/fastlane/metadata/' + escapeHTML(locale) + '/\n- name.txt\n- subtitle.txt\n- promotional_text.txt\n- description.txt\n- keywords.txt\n- release_notes.txt\n- support_url.txt\n- marketing_url.txt\n- privacy_url.txt</div></div>';
+  $('fastlaneGrid').innerHTML = '<div class="card full"><div class="value">AppStoreMetadata/generated/fastlane/metadata/' + escapeHTML(locale) + '/<br>- name.txt<br>- subtitle.txt<br>- promotional_text.txt<br>- description.txt<br>- keywords.txt<br>- release_notes.txt<br>- support_url.txt<br>- marketing_url.txt<br>- privacy_url.txt</div></div>';
 }
 function allTextForLocale(locale) {
   const item = DATA.locales[locale] || {}; const m = item.metadata || {}; const u = item.urls || {};
-  return ['Locale: ' + locale, '', 'Name:', m.name, '', 'Subtitle:', m.subtitle, '', 'Promotional Text:', m.promotional_text, '', 'Description:', m.description, '', 'Keywords:', m.keywords, '', "What's New:", m.whats_new, '', 'Privacy URL:', u.privacy, '', 'Terms URL:', u.terms, '', 'Support URL:', u.support, '', 'Marketing URL:', u.marketing, '', 'Review Notes:', item.review && item.review.notes].map(text).join('\n');
+  return ['Locale: ' + locale, '', 'Name:', m.name, '', 'Subtitle:', m.subtitle, '', 'Promotional Text:', m.promotional_text, '', 'Description:', m.description, '', 'Keywords:', m.keywords, '', "What's New:", m.whats_new, '', 'Privacy URL:', u.privacy, '', 'Terms URL:', u.terms, '', 'Support URL:', u.support, '', 'Marketing URL:', u.marketing, '', 'Review Notes:', item.review && item.review.notes].map(text).join(String.fromCharCode(10));
 }
 $('localeSelect').innerHTML = DATA.localeOrder.map(l => '<option value="' + escapeHTML(l) + '">' + escapeHTML(l) + '</option>').join('');
 $('localeSelect').value = currentLocale;
