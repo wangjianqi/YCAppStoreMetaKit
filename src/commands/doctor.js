@@ -18,8 +18,9 @@ async function doctor(options = {}) {
   checks.push(await existsResult(path.join(dir, 'appstore.config.yaml'), 'appstore.config.yaml'));
   checks.push(await existsResult(path.join(dir, 'locales'), 'locales directory'));
   checks.push(await existsResult(path.join(dir, 'screenshots'), 'screenshots directory'));
-  checks.push(await existsResult(path.join(dir, 'review'), 'review directory'));
   checks.push(await existsResult(path.join(dir, 'generated'), 'generated directory'));
+  checks.push(await existsResult(path.join(root, '.claude', 'skills', 'app-store-metadata', 'SKILL.md'), 'Claude Code skill'));
+  checks.push(await existsResult(path.join(root, '.agents', 'skills', 'app-store-metadata', 'SKILL.md'), 'Codex skill'));
 
   let validation = null;
   if (await fs.pathExists(path.join(dir, 'appstore.config.yaml'))) {

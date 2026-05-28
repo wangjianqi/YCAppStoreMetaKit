@@ -43,6 +43,12 @@ ycmeta init
 ycmeta i
 ```
 
+自定义语言：
+
+```bash
+ycmeta init --locales en-US,ja,ko
+```
+
 创建的目录结构：
 
 ```text
@@ -54,8 +60,6 @@ AppStoreMetadata/
 ├── screenshots/
 │   ├── en-US.yaml
 │   └── zh-Hans.yaml
-├── review/
-│   └── review-notes.en-US.md
 ├── generated/
 └── README.md
 ```
@@ -145,6 +149,12 @@ ycmeta c
 
 ```bash
 ycmeta check --json
+```
+
+按语言过滤：
+
+```bash
+ycmeta check --locale en-US
 ```
 
 ## 生成 HTML 复制面板
@@ -343,6 +353,8 @@ ycmeta agents
 | `ycmeta skill codex` | | 仅生成 Codex 技能 |
 | `ycmeta skill all` | | 生成所有技能和 AGENTS.md |
 | `ycmeta agents` | | 生成或更新 AGENTS.md 规则块 |
+| `ycmeta add-locale <locale>` | | 添加新语言到项目 |
+| `ycmeta clean` | | 删除生成文件 |
 
 ## 推荐工作流
 

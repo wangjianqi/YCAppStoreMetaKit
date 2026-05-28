@@ -8,6 +8,8 @@
   },
   "scripts": {
     "start": "node bin/ycmeta.js",
+    "test": "node --test test/*.test.js",
+    "lint": "eslint bin src test",
     "check": "node bin/ycmeta.js check",
     "build": "node bin/ycmeta.js build",
     "preview": "node bin/ycmeta.js preview",
@@ -43,9 +45,12 @@
     "commander": "^12.1.0",
     "fs-extra": "^11.2.0",
     "js-yaml": "^4.1.0",
-    "open": "^10.1.0"
+    "open": "^8.4.2"
   },
   "engines": {
     "node": ">=18"
+  },
+  "devDependencies": {
+    "eslint": "^8.57.1"
   }
 }

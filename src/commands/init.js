@@ -1,5 +1,6 @@
 const path = require('path');
 const fs = require('fs-extra');
+const yaml = require('js-yaml');
 const { templatesDir, metadataDir } = require('../core/paths');
 const { copyFileIfAbsent, writeFileIfAbsent, relativeFromCwd } = require('../utils/fs');
 const logger = require('../utils/logger');
@@ -14,7 +15,6 @@ This directory is managed by YCAppStoreMetaKit.
 - appstore.config.yaml
 - locales/*.yaml
 - screenshots/*.yaml
-- review/*.md
 
 ## Generated files
 
@@ -34,6 +34,36 @@ Edit source files only. Do not manually edit files under generated/.
 `;
 }
 
+function localeYaml(locale) {
+  return `locale: "${locale}"
+
+metadata:
+  name: ""
+  subtitle: ""
+  promotional_text: ""
+  description: ""
+  keywords: ""
+  whats_new: ""
+
+review:
+  notes: ""
+
+compliance:
+  privacy_summary: ""
+  demo_content_notice: ""
+`;
+}
+
+function screenshotYaml(locale) {
+  return `locale: "${locale}"
+
+sets:
+  iphone_6_9:
+    - title: ""
+      subtitle: ""
+`;
+}
+
 async function init(options = {}) {
   const force = !!options.force;
   const root = process.cwd();
@@ -41,19 +71,49 @@ async function init(options = {}) {
   const templates = templatesDir();
   await fs.ensureDir(dir);
 
-  const tasks = [
-    [path.join(templates, 'appstore.config.yaml'), path.join(dir, 'appstore.config.yaml')],
-    [path.join(templates, 'locale.en-US.yaml'), path.join(dir, 'locales', 'en-US.yaml')],
-    [path.join(templates, 'locale.zh-Hans.yaml'), path.join(dir, 'locales', 'zh-Hans.yaml')],
-    [path.join(templates, 'screenshots.en-US.yaml'), path.join(dir, 'screenshots', 'en-US.yaml')],
-    [path.join(templates, 'screenshots.zh-Hans.yaml'), path.join(dir, 'screenshots', 'zh-Hans.yaml')],
-    [path.join(templates, 'review-notes.en-US.md'), path.join(dir, 'review', 'review-notes.en-US.md')]
-  ];
+  const localeList = options.locales
+    ? options.locales.split(',').map(l => l.trim()).filter(Boolean)
+    : ['en-US', 'zh-Hans'];
+
+  const builtinLocales = ['en-US', 'zh-Hans'];
+  const tasks = [];
+
+  tasks.push([path.join(templates, 'appstore.config.yaml'), path.join(dir, 'appstore.config.yaml')]);
+
+  for (const locale of localeList) {
+    if (builtinLocales.includes(locale)) {
+      tasks.push([path.join(templates, `locale.${locale}.yaml`), path.join(dir, 'locales', `${locale}.yaml`)]);
+      tasks.push([path.join(templates, `screenshots.${locale}.yaml`), path.join(dir, 'screenshots', `${locale}.yaml`)]);
+    }
+  }
 
   const results = [];
   for (const [from, to] of tasks) {
     results.push(await copyFileIfAbsent(from, to, { force }));
   }
+
+  for (const locale of localeList) {
+    if (!builtinLocales.includes(locale)) {
+      const localeFilePath = path.join(dir, 'locales', `${locale}.yaml`);
+      results.push(await writeFileIfAbsent(localeFilePath, localeYaml(locale), { force }));
+      const screenshotFilePath = path.join(dir, 'screenshots', `${locale}.yaml`);
+      results.push(await writeFileIfAbsent(screenshotFilePath, screenshotYaml(locale), { force }));
+    }
+  }
+
+  if (options.locales) {
+    const configPath = path.join(dir, 'appstore.config.yaml');
+    if (await fs.pathExists(configPath)) {
+      const configText = await fs.readFile(configPath, 'utf8');
+      const config = yaml.load(configText) || {};
+      config.store = config.store || {};
+      config.store.locales = localeList;
+      config.store.default_locale = localeList[0] || 'en-US';
+      config.store.primary_language = localeList[0] || 'en-US';
+      await fs.writeFile(configPath, yaml.dump(config, { lineWidth: -1, noRefs: true }), 'utf8');
+    }
+  }
+
   await fs.ensureDir(path.join(dir, 'generated'));
   results.push(await writeFileIfAbsent(path.join(dir, 'README.md'), projectReadme(), { force }));
 

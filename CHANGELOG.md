@@ -28,3 +28,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Claude Code Skill with field limits, writing rules, and localization rules
 - Codex Skill with OpenAI agent YAML
 - AGENTS.md managed block for project-level rules
+
+[1.0.0]: https://github.com/wangjianqi/YCAppStoreMetaKit/releases/tag/v1.0.0

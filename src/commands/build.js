@@ -8,15 +8,26 @@ const { generateMarkdown } = require('../generators/markdownGenerator');
 const logger = require('../utils/logger');
 const { relativeFromCwd } = require('../utils/fs');
 
-async function build() {
+function filterMetadata(metadata, locale) {
+  if (!locale) return metadata;
+  return {
+    ...metadata,
+    configuredLocales: [locale],
+    locales: { [locale]: metadata.locales[locale] || {} },
+    screenshots: { [locale]: metadata.screenshots[locale] || {} }
+  };
+}
+
+async function build(options = {}) {
   const metadata = await loadMetadata(process.cwd());
-  const report = validateMetadata(metadata);
+  const filtered = filterMetadata(metadata, options.locale);
+  const report = validateMetadata(filtered);
   const outDir = generatedDir(process.cwd());
   await fs.ensureDir(outDir);
   const htmlPath = path.join(outDir, 'index.html');
   const summaryPath = path.join(outDir, 'summary.md');
-  await fs.writeFile(htmlPath, generateHtml(metadata, report), 'utf8');
-  await fs.writeFile(summaryPath, generateMarkdown(metadata), 'utf8');
+  await fs.writeFile(htmlPath, generateHtml(filtered, report), 'utf8');
+  await fs.writeFile(summaryPath, generateMarkdown(filtered), 'utf8');
   logger.success('Generated App Store metadata assets.');
   logger.plain(`- ${relativeFromCwd(htmlPath)}`);
   logger.plain(`- ${relativeFromCwd(summaryPath)}`);

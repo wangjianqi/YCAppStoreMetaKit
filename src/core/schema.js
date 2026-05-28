@@ -8,6 +8,22 @@ const LIMITS = Object.freeze({
   review_notes: { max: 4000, unit: 'utf8-bytes' }
 });
 
+const SCREENSHOT_LIMITS = Object.freeze({
+  title: { max: 30, unit: 'characters' },
+  subtitle: { max: 45, unit: 'characters' }
+});
+
+const VALID_PLATFORMS = ['ios', 'macos', 'tvos', 'visionos'];
+
+const VALID_SCREENSHOT_SETS = [
+  'iphone_6_9',
+  'iphone_6_7',
+  'ipad_13',
+  'ipad_11',
+  'ipad_pro_13',
+  'ipad_pro_12'
+];
+
 const REQUIRED_CONFIG_PATHS = [
   'app.internal_name',
   'app.app_store_name',
@@ -33,6 +49,9 @@ const REQUIRED_LOCALE_METADATA_FIELDS = [
 
 module.exports = {
   LIMITS,
+  SCREENSHOT_LIMITS,
+  VALID_PLATFORMS,
+  VALID_SCREENSHOT_SETS,
   REQUIRED_CONFIG_PATHS,
   REQUIRED_LOCALE_METADATA_FIELDS
 };

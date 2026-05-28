@@ -3,6 +3,7 @@ const fs = require('fs-extra');
 const { generatedDir, requireMetadataDir } = require('../core/paths');
 const logger = require('../utils/logger');
 const { pathToFileURL } = require('url');
+const open = require('open');
 
 async function openGenerated() {
   requireMetadataDir(process.cwd());
@@ -12,7 +13,6 @@ async function openGenerated() {
     err.exitCode = 1;
     throw err;
   }
-  const open = (await import('open')).default;
   await open(pathToFileURL(htmlPath).href);
   logger.success('Opened AppStoreMetadata/generated/index.html');
 }

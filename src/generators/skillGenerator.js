@@ -1,5 +1,4 @@
 const path = require('path');
-const fs = require('fs-extra');
 const { templatesDir } = require('../core/paths');
 const { copyFileIfAbsent, writeFileIfAbsent } = require('../utils/fs');
 const { generateAgents } = require('./agentsGenerator');

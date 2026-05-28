@@ -1,6 +1,6 @@
 const path = require('path');
 const utf8ByteLength = require('./byteLength');
-const { LIMITS, REQUIRED_CONFIG_PATHS, REQUIRED_LOCALE_METADATA_FIELDS } = require('./schema');
+const { LIMITS, SCREENSHOT_LIMITS, VALID_PLATFORMS, VALID_SCREENSHOT_SETS, REQUIRED_CONFIG_PATHS, REQUIRED_LOCALE_METADATA_FIELDS } = require('./schema');
 const { getLocaleUrl } = require('./loadMetadata');
 
 function get(obj, dotted) {
@@ -97,6 +97,10 @@ function validateMetadata(metadata) {
     checkCharMax(result, locale, 'metadata.subtitle', m.subtitle, LIMITS.subtitle.max);
     checkCharMax(result, locale, 'metadata.promotional_text', m.promotional_text, LIMITS.promotional_text.max);
     checkCharMax(result, locale, 'metadata.description', m.description, LIMITS.description.max);
+    const descLength = String(m.description || '').length;
+    if (descLength > 0 && descLength < 10) {
+      push(result, 'warnings', 'DESCRIPTION_TOO_SHORT', `${locale} metadata.description is only ${descLength} characters. Consider writing a longer description.`, { locale, field: 'metadata.description', count: descLength });
+    }
     checkByteMax(result, locale, 'metadata.keywords', m.keywords, LIMITS.keywords.max);
     checkCharMax(result, locale, 'metadata.whats_new', m.whats_new, LIMITS.whats_new.max);
     checkByteMax(result, locale, 'review.notes', localeData?.review?.notes || '', LIMITS.review_notes.max);
@@ -135,6 +139,55 @@ function validateMetadata(metadata) {
     }
     if (suspicious.length) {
       push(result, 'warnings', 'KEYWORDS_REVIEW_RECOMMENDED', `${locale} metadata.keywords may include ${suspicious.join(', ')}. Review before submission.`, { locale, field: 'metadata.keywords', suspicious });
+    }
+
+    const keywordList = String(m.keywords || '').split(',').map(k => k.trim().toLowerCase()).filter(Boolean);
+    const seen = new Set();
+    const duplicates = [];
+    for (const kw of keywordList) {
+      if (seen.has(kw)) duplicates.push(kw);
+      seen.add(kw);
+    }
+    if (duplicates.length) {
+      push(result, 'warnings', 'KEYWORDS_DUPLICATE', `${locale} metadata.keywords has duplicate entries: ${duplicates.join(', ')}.`, { locale, field: 'metadata.keywords', duplicates });
+    }
+
+    const hasLeadingTrailingSpaces = String(m.keywords || '').split(',').some(k => k !== k.trim());
+    if (hasLeadingTrailingSpaces) {
+      push(result, 'warnings', 'KEYWORDS_WHITESPACE', `${locale} metadata.keywords has entries with leading or trailing spaces.`, { locale, field: 'metadata.keywords' });
+    }
+  }
+
+  const platform = config?.app?.platform;
+  if (platform && !VALID_PLATFORMS.includes(platform)) {
+    push(result, 'errors', 'INVALID_PLATFORM', `app.platform "${platform}" is not valid. Expected one of: ${VALID_PLATFORMS.join(', ')}.`, { field: 'app.platform', value: platform });
+  }
+
+  const appleId = config?.app?.apple_id;
+  if (appleId && !/^\d+$/.test(String(appleId).trim())) {
+    push(result, 'warnings', 'APPLE_ID_FORMAT', `app.apple_id "${appleId}" does not look like a numeric Apple ID.`, { field: 'app.apple_id', value: appleId });
+  }
+
+  for (const locale of configuredLocales) {
+    const screenshotData = metadata.screenshots[locale];
+    if (!screenshotData) continue;
+    const sets = screenshotData.sets || {};
+    for (const [setName, items] of Object.entries(sets)) {
+      if (!VALID_SCREENSHOT_SETS.includes(setName)) {
+        push(result, 'warnings', 'UNKNOWN_SCREENSHOT_SET', `${locale} screenshots set "${setName}" is not a recognized Apple device type. Expected one of: ${VALID_SCREENSHOT_SETS.join(', ')}.`, { locale, setName });
+      }
+      if (!Array.isArray(items)) continue;
+      for (let i = 0; i < items.length; i++) {
+        const item = items[i];
+        const titleLen = String(item.title || '').length;
+        if (titleLen > SCREENSHOT_LIMITS.title.max) {
+          push(result, 'errors', 'SCREENSHOT_TITLE_TOO_LONG', `${locale} screenshots.${setName}[${i}].title is ${titleLen}/${SCREENSHOT_LIMITS.title.max} characters.`, { locale, setName, index: i, field: 'title', count: titleLen, limit: SCREENSHOT_LIMITS.title.max });
+        }
+        const subtitleLen = String(item.subtitle || '').length;
+        if (subtitleLen > SCREENSHOT_LIMITS.subtitle.max) {
+          push(result, 'errors', 'SCREENSHOT_SUBTITLE_TOO_LONG', `${locale} screenshots.${setName}[${i}].subtitle is ${subtitleLen}/${SCREENSHOT_LIMITS.subtitle.max} characters.`, { locale, setName, index: i, field: 'subtitle', count: subtitleLen, limit: SCREENSHOT_LIMITS.subtitle.max });
+        }
+      }
     }
   }
 

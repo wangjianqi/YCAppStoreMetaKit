@@ -1,4 +1,3 @@
-const utf8ByteLength = require('../core/byteLength');
 const { getLocaleUrl } = require('../core/loadMetadata');
 const { LIMITS } = require('../core/schema');
 
@@ -108,6 +107,7 @@ function generateHtml(metadata, validationReport) {
     .screenshot { border: 1px solid var(--line); border-radius: 16px; padding: 12px; margin: 10px 0; }
     .screenshot strong { display: block; margin-bottom: 4px; }
     @media (max-width: 900px) { .app { grid-template-columns: 1fr; } aside { position: relative; height: auto; } .grid { grid-template-columns: 1fr; } .topbar { align-items: flex-start; flex-direction: column; } }
+    @media print { aside { display: none; } .app { grid-template-columns: 1fr; } .card { box-shadow: none; border: 1px solid #ccc; } button { display: none; } .value { max-height: none; } }
   </style>
 </head>
 <body>

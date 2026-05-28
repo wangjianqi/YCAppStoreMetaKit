@@ -43,6 +43,12 @@ Short alias:
 ycmeta i
 ```
 
+Custom locales:
+
+```bash
+ycmeta init --locales en-US,ja,ko
+```
+
 This creates:
 
 ```text
@@ -54,8 +60,6 @@ AppStoreMetadata/
 ├── screenshots/
 │   ├── en-US.yaml
 │   └── zh-Hans.yaml
-├── review/
-│   └── review-notes.en-US.md
 ├── generated/
 └── README.md
 ```
@@ -145,6 +149,12 @@ Machine-readable output:
 
 ```bash
 ycmeta check --json
+```
+
+Filter by locale:
+
+```bash
+ycmeta check --locale en-US
 ```
 
 ## Generate HTML copy panel
@@ -343,6 +353,8 @@ This creates or updates a controlled YCAppStoreMetaKit block in `AGENTS.md` with
 | `ycmeta skill codex` | | Generate only Codex Skill |
 | `ycmeta skill all` | | Generate all Skills and AGENTS.md |
 | `ycmeta agents` | | Generate or update AGENTS.md rules block |
+| `ycmeta add-locale <locale>` | | Add a new locale to the project |
+| `ycmeta clean` | | Remove generated files |
 
 ## Recommended workflow
 

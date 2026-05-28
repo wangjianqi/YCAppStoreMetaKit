@@ -1,7 +1,7 @@
 const fs = require('fs-extra');
 const path = require('path');
 const yaml = require('js-yaml');
-const { metadataDir, requireMetadataDir } = require('./paths');
+const { requireMetadataDir } = require('./paths');
 
 async function loadYamlFile(filePath) {
   try {

@@ -10,6 +10,8 @@ const fastlane = require('../src/commands/fastlane');
 const doctor = require('../src/commands/doctor');
 const skill = require('../src/commands/skill');
 const agents = require('../src/commands/agents');
+const addLocale = require('../src/commands/addLocale');
+const clean = require('../src/commands/clean');
 
 const program = new Command();
 
@@ -40,6 +42,7 @@ program
   .alias('i')
   .description('Initialize AppStoreMetadata in the current project')
   .option('--force', 'overwrite existing files')
+  .option('--locales <locales>', 'comma-separated locale list (default: en-US,zh-Hans)')
   .action(handle(init));
 
 program
@@ -47,12 +50,14 @@ program
   .alias('c')
   .description('Check AppStoreMetadata fields, URLs, locales, and App Store limits')
   .option('--json', 'output machine-readable JSON without colored logs')
+  .option('--locale <locale>', 'check only the specified locale')
   .action(handle(check));
 
 program
   .command('build')
   .alias('b')
   .description('Build generated/index.html and generated/summary.md')
+  .option('--locale <locale>', 'build only the specified locale')
   .action(handle(build));
 
 program
@@ -92,6 +97,17 @@ program
   .description('Generate or update YCAppStoreMetaKit rules block in AGENTS.md')
   .option('--force', 'accepted for consistency; AGENTS.md managed block is always updated')
   .action(handle(agents));
+
+program
+  .command('add-locale <locale>')
+  .description('Add a new locale to the project')
+  .option('--force', 'overwrite existing locale files')
+  .action(handle(addLocale));
+
+program
+  .command('clean')
+  .description('Remove generated files')
+  .action(handle(clean));
 
 program.on('command:*', () => {
   console.error(`Unknown command: ${program.args.join(' ')}`);
