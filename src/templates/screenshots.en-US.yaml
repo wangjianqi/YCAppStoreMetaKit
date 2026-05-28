@@ -1,0 +1,13 @@
+locale: "en-US"
+
+sets:
+  iphone_6_9:
+    - title: "Organize Daily Tasks"
+      subtitle: "Create simple lists and keep your day focused."
+    - title: "Clean Local Workflow"
+      subtitle: "Manage your notes and tasks on device."
+    - title: "Simple by Design"
+      subtitle: "A focused interface for everyday organization."
+  ipad_13:
+    - title: "Plan on a Larger Screen"
+      subtitle: "Review and organize tasks with more space."

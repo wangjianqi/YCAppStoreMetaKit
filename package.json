@@ -1,0 +1,51 @@
+{
+  "name": "yc-appstore-metakit",
+  "version": "1.0.0",
+  "description": "Local CLI toolkit for managing Apple App Store metadata, static copy panels, fastlane export, and AI agent skills.",
+  "main": "bin/ycmeta.js",
+  "bin": {
+    "ycmeta": "./bin/ycmeta.js"
+  },
+  "scripts": {
+    "start": "node bin/ycmeta.js",
+    "check": "node bin/ycmeta.js check",
+    "build": "node bin/ycmeta.js build",
+    "preview": "node bin/ycmeta.js preview",
+    "doctor": "node bin/ycmeta.js doctor"
+  },
+  "keywords": [
+    "app-store",
+    "metadata",
+    "app-store-connect",
+    "fastlane",
+    "claude-code",
+    "codex",
+    "skills"
+  ],
+  "author": "Henan Yuechuan Intelligent Technology Co., Ltd.",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yuechuanai/YCAppStoreMetaKit.git"
+  },
+  "bugs": {
+    "url": "https://github.com/yuechuanai/YCAppStoreMetaKit/issues"
+  },
+  "homepage": "https://github.com/yuechuanai/YCAppStoreMetaKit#readme",
+  "files": [
+    "bin",
+    "src",
+    "LICENSE",
+    "README.md"
+  ],
+  "dependencies": {
+    "chalk": "^5.3.0",
+    "commander": "^12.1.0",
+    "fs-extra": "^11.2.0",
+    "js-yaml": "^4.1.0",
+    "open": "^10.1.0"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

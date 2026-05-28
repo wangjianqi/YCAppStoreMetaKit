@@ -1,0 +1,7 @@
+interface:
+  display_name: "App Store Metadata"
+  short_description: "Generate, validate, localize, and prepare Apple App Store metadata using ycmeta."
+  default_prompt: "Use this skill to update AppStoreMetadata safely, then run ycmeta check."
+
+policy:
+  allow_implicit_invocation: true

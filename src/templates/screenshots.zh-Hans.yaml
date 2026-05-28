@@ -1,0 +1,13 @@
+locale: "zh-Hans"
+
+sets:
+  iphone_6_9:
+    - title: "整理日常任务"
+      subtitle: "创建简单清单，让每天更专注。"
+    - title: "本地管理流程"
+      subtitle: "在设备上管理记录与任务。"
+    - title: "简洁易用设计"
+      subtitle: "为日常整理而设计的专注界面。"
+  ipad_13:
+    - title: "大屏规划更清晰"
+      subtitle: "用更大的空间查看和整理任务。"

@@ -1,0 +1,44 @@
+app:
+  internal_name: "SampleApp"
+  app_store_name: "SampleApp"
+  bundle_id: "com.yuechuan.sampleapp"
+  sku: "sampleapp-ios-001"
+  apple_id: ""
+  version: "1.0.0"
+  platform: "ios"
+
+company:
+  name: "Henan Yuechuan Intelligent Technology Co., Ltd."
+  copyright: "2026 Henan Yuechuan Intelligent Technology Co., Ltd."
+
+urls:
+  privacy:
+    en-US: "https://www.yuechuanai.cn/apps/sampleapp/privacy/en.html"
+    zh-Hans: "https://www.yuechuanai.cn/apps/sampleapp/privacy/zh.html"
+  terms:
+    en-US: "https://www.apple.com/legal/internet-services/itunes/dev/stdeula/"
+    zh-Hans: "https://www.apple.com/legal/internet-services/itunes/dev/stdeula/"
+  support:
+    en-US: "https://www.yuechuanai.cn/apps/sampleapp/support/en.html"
+    zh-Hans: "https://www.yuechuanai.cn/apps/sampleapp/support/zh.html"
+  marketing:
+    en-US: "https://www.yuechuanai.cn/apps/sampleapp/"
+    zh-Hans: "https://www.yuechuanai.cn/apps/sampleapp/"
+
+store:
+  primary_language: "en-US"
+  default_locale: "en-US"
+  locales:
+    - "en-US"
+    - "zh-Hans"
+  primary_category: "Utilities"
+  secondary_category: "Productivity"
+
+features:
+  has_subscription: false
+  uses_camera: false
+  uses_photos: false
+  uses_face_data: false
+  uses_location: false
+  uses_network: false
+  opens_legal_links_externally: true

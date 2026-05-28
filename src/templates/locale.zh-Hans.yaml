@@ -1,0 +1,41 @@
+locale: "zh-Hans"
+
+metadata:
+  name: "SampleApp"
+  subtitle: "本地管理日常任务"
+  promotional_text: "一款简洁的工具类应用，帮助你在本地设备上管理日常任务和简单记录。"
+  description: |
+    SampleApp 是一款简洁的工具类应用，帮助用户在本地设备上管理日常任务。
+
+    主要功能：
+    - 创建和管理简单任务列表
+    - 整理日常记录
+    - 使用清爽、专注的界面
+    - 适合本地、私密的个人管理场景
+
+    隐私说明：
+    SampleApp 设计为在你的设备本地保存应用内容。应用不会将你的任务数据上传到后端服务器用于广告、跟踪或模型训练。
+
+    使用条款：
+    https://www.apple.com/legal/internet-services/itunes/dev/stdeula/
+  keywords: "任务,清单,日程,记录,本地管理,效率"
+  whats_new: |
+    首次发布。
+
+review:
+  notes: |
+    Thank you for reviewing SampleApp.
+
+    SampleApp is a simple utility app for organizing daily tasks. The app is designed for local use and does not require account registration.
+
+    Privacy Policy:
+    https://www.yuechuanai.cn/apps/sampleapp/privacy/en.html
+
+    Terms of Use:
+    https://www.apple.com/legal/internet-services/itunes/dev/stdeula/
+
+compliance:
+  privacy_summary: |
+    应用设计为在设备本地保存用户创建的任务内容，不会将任务内容上传到后端服务器用于广告、跟踪或模型训练。
+  demo_content_notice: |
+    App Store 截图和预览素材仅使用示例内容，不包含真实用户个人数据。

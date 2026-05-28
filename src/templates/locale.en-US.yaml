@@ -1,0 +1,41 @@
+locale: "en-US"
+
+metadata:
+  name: "SampleApp"
+  subtitle: "Organize tasks locally"
+  promotional_text: "A simple utility app designed to help you organize daily tasks locally on your device."
+  description: |
+    SampleApp is a simple utility app designed to help users organize their daily tasks locally on device.
+
+    Key Features:
+    - Create and manage simple task lists
+    - Keep daily notes organized
+    - Use a clean and focused interface
+    - Designed for local, private use
+
+    Privacy:
+    SampleApp is designed to store app content locally on your device. The app does not upload your task data to a backend server for advertising, tracking, or model training.
+
+    Terms of Use:
+    https://www.apple.com/legal/internet-services/itunes/dev/stdeula/
+  keywords: "task list,daily planner,notes,organizer,local tasks,productivity"
+  whats_new: |
+    Initial release.
+
+review:
+  notes: |
+    Thank you for reviewing SampleApp.
+
+    SampleApp is a simple utility app for organizing daily tasks. The app is designed for local use and does not require account registration.
+
+    Privacy Policy:
+    https://www.yuechuanai.cn/apps/sampleapp/privacy/en.html
+
+    Terms of Use:
+    https://www.apple.com/legal/internet-services/itunes/dev/stdeula/
+
+compliance:
+  privacy_summary: |
+    The app is designed to store user-created task content locally on device. It does not upload task content to a backend server for advertising, tracking, or model training.
+  demo_content_notice: |
+    App Store screenshots and preview materials use sample content only and do not include personal user data.
