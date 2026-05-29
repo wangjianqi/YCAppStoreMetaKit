@@ -2,6 +2,7 @@ const path = require('path');
 const fs = require('fs-extra');
 const { generatedDir } = require('../core/paths');
 const { getLocaleUrl } = require('../core/loadMetadata');
+const logger = require('../utils/logger');
 
 async function write(filePath, value) {
   await fs.ensureDir(path.dirname(filePath));
@@ -60,8 +61,8 @@ async function generateFastlane(metadata) {
         try {
           await fs.copy(src, dest, { overwrite: true });
           written.push(dest);
-        } catch {
-          // skip files that cannot be copied
+        } catch (copyErr) {
+          logger.warn(`Failed to copy ${src} to fastlane output: ${copyErr.message}`);
         }
       }
     }

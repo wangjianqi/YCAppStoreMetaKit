@@ -14,14 +14,16 @@ function filterMetadata(metadata, locale) {
     ...metadata,
     configuredLocales: [locale],
     locales: { [locale]: metadata.locales[locale] || {} },
-    screenshots: { [locale]: metadata.screenshots[locale] || {} }
+    screenshots: { [locale]: metadata.screenshots[locale] || {} },
+    missingLocaleFiles: (metadata.missingLocaleFiles || []).filter(f => path.basename(f, '.yaml') === locale),
+    missingScreenshotFiles: (metadata.missingScreenshotFiles || []).filter(f => path.basename(f, '.yaml') === locale)
   };
 }
 
 async function build(options = {}) {
   const metadata = await loadMetadata(process.cwd());
   const filtered = filterMetadata(metadata, options.locale);
-  const report = validateMetadata(filtered);
+  const report = await validateMetadata(filtered);
   const outDir = generatedDir(process.cwd());
   await fs.ensureDir(outDir);
   const htmlPath = path.join(outDir, 'index.html');

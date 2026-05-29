@@ -1,5 +1,5 @@
 const { getLocaleUrl } = require('../core/loadMetadata');
-const { LIMITS } = require('../core/schema');
+const { LIMITS, SCREENSHOT_RESOLUTIONS } = require('../core/schema');
 
 function escapeHtml(value) {
   return String(value || '')
@@ -41,7 +41,7 @@ function preparePayload(metadata, validationReport) {
     localeOrder: metadata.configuredLocales,
     validationReport,
     limits: LIMITS,
-    screenshotResolutions: require('../core/schema').SCREENSHOT_RESOLUTIONS
+    screenshotResolutions: SCREENSHOT_RESOLUTIONS
   };
 }
 
@@ -179,8 +179,9 @@ function counter(value, limit, unit) {
   const bad = limit && count > limit;
   return '<span class="counter ' + (bad ? 'bad' : 'ok') + '">' + count + (limit ? '/' + limit : '') + ' ' + (unit === 'bytes' ? 'bytes' : 'chars') + '</span>';
 }
+let _fieldId = 0;
 function fieldCard(title, value, limit, unit = 'chars', full = false) {
-  const id = 'copy_' + Math.random().toString(36).slice(2);
+  const id = 'copy_' + (++_fieldId);
   setTimeout(() => { const b = document.getElementById(id); if (b) b.onclick = () => copyValue(value, b); }, 0);
   return '<div class="card ' + (full ? 'full' : '') + '"><div class="field-head"><div><div class="field-title">' + escapeHTML(title) + '</div>' + counter(value, limit, unit) + '</div><button class="secondary" id="' + id + '">Copy</button></div><div class="value">' + escapeHTML(value) + '</div></div>';
 }

@@ -4,7 +4,7 @@ const logger = require('../utils/logger');
 const { relativeFromCwd } = require('../utils/fs');
 
 async function clean() {
-  requireMetadataDir(process.cwd());
+  await requireMetadataDir(process.cwd());
   const dir = generatedDir(process.cwd());
   if (!await fs.pathExists(dir)) {
     logger.warn('generated/ directory does not exist. Nothing to clean.');

@@ -11,28 +11,59 @@ const doctor = require('../src/commands/doctor');
 const skill = require('../src/commands/skill');
 const agents = require('../src/commands/agents');
 const addLocale = require('../src/commands/addLocale');
+const removeLocale = require('../src/commands/removeLocale');
 const clean = require('../src/commands/clean');
+const diff = require('../src/commands/diff');
+const listLocales = require('../src/commands/list');
+const importFastlane = require('../src/commands/importFastlane');
 
 const program = new Command();
 
 program
   .name('ycmeta')
   .description('YCAppStoreMetaKit CLI for Apple App Store metadata management')
-  .version(pkg.version);
+  .version(pkg.version)
+  .option('--verbose', 'show verbose output')
+  .option('--quiet', 'suppress non-error output')
+  .option('--no-color', 'disable colored output');
 
 function handle(action) {
   return async (...args) => {
-    try {
-      await action(...args);
-    } catch (error) {
-      const maybeOptions = args[args.length - 1];
-      const jsonMode = maybeOptions && typeof maybeOptions.opts === 'function' && maybeOptions.opts().json;
-      if (jsonMode) {
-        process.stdout.write(JSON.stringify({ ok: false, errors: [error.message], warnings: [], passed: [] }, null, 2) + '\n');
-      } else {
-        console.error(`Error: ${error.message}`);
+    const maybeOptions = args[args.length - 1];
+    const globalOpts = maybeOptions && typeof maybeOptions.opts === 'function' ? program.opts() : {};
+    if (globalOpts.quiet) {
+      const origLog = console.log;
+      const origInfo = console.info;
+      console.log = () => {};
+      console.info = () => {};
+      try {
+        await action(...args);
+      } catch (error) {
+        console.log = origLog;
+        console.info = origInfo;
+        const jsonMode = maybeOptions && typeof maybeOptions.opts === 'function' && maybeOptions.opts().json;
+        if (jsonMode) {
+          process.stdout.write(JSON.stringify({ ok: false, errors: [error.message], warnings: [], passed: [] }, null, 2) + '\n');
+        } else {
+          console.error(`Error: ${error.message}`);
+        }
+        process.exitCode = typeof error.exitCode === 'number' ? error.exitCode : 1;
+      } finally {
+        console.log = origLog;
+        console.info = origInfo;
       }
-      process.exitCode = typeof error.exitCode === 'number' ? error.exitCode : 1;
+    } else {
+      try {
+        await action(...args);
+      } catch (error) {
+        const jsonMode = maybeOptions && typeof maybeOptions.opts === 'function' && maybeOptions.opts().json;
+        if (jsonMode) {
+          process.stdout.write(JSON.stringify({ ok: false, errors: [error.message], warnings: [], passed: [] }, null, 2) + '\n');
+        } else {
+          console.error(`Error: ${error.message}`);
+        }
+        process.exitCode = typeof error.exitCode === 'number' ? error.exitCode : 1;
+      }
     }
   };
 }
@@ -43,6 +74,7 @@ program
   .description('Initialize AppStoreMetadata in the current project')
   .option('--force', 'overwrite existing files')
   .option('--locales <locales>', 'comma-separated locale list (default: en-US,zh-Hans)')
+  .option('--dry-run', 'preview what would be created without writing files')
   .action(handle(init));
 
 program
@@ -76,6 +108,7 @@ program
   .command('fastlane')
   .alias('f')
   .description('Export fastlane metadata files')
+  .option('--dry-run', 'preview what would be exported without writing files')
   .action(handle(fastlane));
 
 program
@@ -103,6 +136,32 @@ program
   .description('Add a new locale to the project')
   .option('--force', 'overwrite existing locale files')
   .action(handle(addLocale));
+
+program
+  .command('remove-locale <locale>')
+  .description('Remove a locale from the project')
+  .option('--force', 'confirm removal without prompt')
+  .action(handle(removeLocale));
+
+program
+  .command('diff <localeA> <localeB>')
+  .description('Compare metadata between two locales')
+  .option('--json', 'output machine-readable JSON')
+  .action(handle(diff));
+
+program
+  .command('list')
+  .alias('ls')
+  .description('List configured locales and their completion status')
+  .option('--json', 'output machine-readable JSON')
+  .action(handle(listLocales));
+
+program
+  .command('import')
+  .description('Import metadata from an existing fastlane metadata directory')
+  .option('--from <path>', 'source fastlane metadata directory (required)')
+  .option('--dry-run', 'preview what would be imported without writing files')
+  .action(handle(importFastlane));
 
 program
   .command('clean')

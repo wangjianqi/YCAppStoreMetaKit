@@ -7,3 +7,5 @@ Thumbs.db
 
 AppStoreMetadata/generated/
 .trae/documents/
+coverage/
+*.tgz

@@ -27,7 +27,7 @@ async function doctor(options = {}) {
   if (await fs.pathExists(path.join(dir, 'appstore.config.yaml'))) {
     try {
       const metadata = await loadMetadata(root);
-      validation = validateMetadata(metadata);
+      validation = await validateMetadata(metadata);
     } catch (error) {
       checks.push({ ok: false, message: `YAML/load error: ${error.message}` });
     }
@@ -51,7 +51,11 @@ async function doctor(options = {}) {
     }
   }
 
-  if (!ok) process.exitCode = 1;
+  if (!ok) {
+    const err = new Error('Doctor check failed');
+    err.exitCode = 1;
+    throw err;
+  }
 }
 
 module.exports = doctor;

@@ -1,4 +1,5 @@
 const path = require('path');
+const fs = require('fs-extra');
 
 function projectRoot() {
   return process.cwd();
@@ -28,10 +29,9 @@ function templatesDir() {
   return path.join(__dirname, '..', 'templates');
 }
 
-function requireMetadataDir(root = projectRoot()) {
-  const fs = require('fs-extra');
+async function requireMetadataDir(root = projectRoot()) {
   const dir = metadataDir(root);
-  if (!fs.existsSync(dir)) {
+  if (!await fs.pathExists(dir)) {
     const err = new Error('AppStoreMetadata not found. Run `ycmeta init` first.');
     err.exitCode = 1;
     throw err;

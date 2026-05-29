@@ -1,4 +1,4 @@
-const { describe, it, beforeEach, afterEach } = require('node:test');
+const { describe, it, afterEach } = require('node:test');
 const assert = require('node:assert/strict');
 const path = require('path');
 const fs = require('fs-extra');
@@ -24,13 +24,13 @@ function cleanup() {
 describe('validateAssets', () => {
   afterEach(cleanup);
 
-  it('returns empty results when no assets', () => {
-    const result = validateAssets({}, {});
+  it('returns empty results when no assets', async () => {
+    const result = await validateAssets({}, {});
     assert.equal(result.errors.length, 0);
     assert.equal(result.warnings.length, 0);
   });
 
-  it('warns when screenshot copy has no matching assets', () => {
+  it('warns when screenshot copy has no matching assets', async () => {
     const assets = { screenshots: {}, videos: {} };
     const screenshotCopy = {
       'en-US': {
@@ -39,7 +39,7 @@ describe('validateAssets', () => {
         }
       }
     };
-    const result = validateAssets(assets, screenshotCopy);
+    const result = await validateAssets(assets, screenshotCopy);
     assert.ok(result.warnings.some(w => w.code === 'NO_ASSETS_FOR_SET'));
   });
 
@@ -54,11 +54,11 @@ describe('validateAssets', () => {
       screenshots: { 'en-US': { iphone_6_9: files } },
       videos: {}
     };
-    const result = validateAssets(assets, {});
+    const result = await validateAssets(assets, {});
     assert.ok(result.errors.some(e => e.code === 'SCREENSHOT_TOO_MANY'));
   });
 
-  it('warns on screenshot/copy count mismatch', () => {
+  it('warns on screenshot/copy count mismatch', async () => {
     const assets = {
       screenshots: { 'en-US': { iphone_6_9: ['/fake/01.png', '/fake/02.png'] } },
       videos: {}
@@ -70,43 +70,43 @@ describe('validateAssets', () => {
         }
       }
     };
-    const result = validateAssets(assets, screenshotCopy);
+    const result = await validateAssets(assets, screenshotCopy);
     assert.ok(result.warnings.some(w => w.code === 'SCREENSHOT_COPY_MISMATCH'));
   });
 
-  it('errors on invalid screenshot format', () => {
+  it('errors on invalid screenshot format', async () => {
     const assets = {
       screenshots: { 'en-US': { iphone_6_9: ['/fake/01.gif'] } },
       videos: {}
     };
-    const result = validateAssets(assets, {});
+    const result = await validateAssets(assets, {});
     assert.ok(result.errors.some(e => e.code === 'SCREENSHOT_INVALID_FORMAT'));
   });
 
-  it('errors on invalid video format', () => {
+  it('errors on invalid video format', async () => {
     const assets = {
       screenshots: {},
       videos: { 'en-US': { iphone_6_9: ['/fake/preview.avi'] } }
     };
-    const result = validateAssets(assets, {});
+    const result = await validateAssets(assets, {});
     assert.ok(result.errors.some(e => e.code === 'VIDEO_INVALID_FORMAT'));
   });
 
-  it('errors on too many videos per set', () => {
+  it('errors on too many videos per set', async () => {
     const assets = {
       screenshots: {},
       videos: { 'en-US': { iphone_6_9: ['/fake/iphone_6_9_01.mp4', '/fake/iphone_6_9_02.mp4', '/fake/iphone_6_9_03.mp4', '/fake/iphone_6_9_04.mp4'] } }
     };
-    const result = validateAssets(assets, {});
+    const result = await validateAssets(assets, {});
     assert.ok(result.errors.some(e => e.code === 'VIDEO_TOO_MANY'));
   });
 
-  it('warns on unknown screenshot set directory', () => {
+  it('warns on unknown screenshot set directory', async () => {
     const assets = {
       screenshots: { 'en-US': { unknown_device: ['/fake/01.png'] } },
       videos: {}
     };
-    const result = validateAssets(assets, {});
+    const result = await validateAssets(assets, {});
     assert.ok(result.warnings.some(w => w.code === 'UNKNOWN_SCREENSHOT_SET_DIR'));
   });
 });

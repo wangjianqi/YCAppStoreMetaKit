@@ -73,6 +73,30 @@ const REQUIRED_LOCALE_METADATA_FIELDS = [
   'whats_new'
 ];
 
+const DESCRIPTION_MIN_LENGTH = 10;
+
+const COMPETITOR_TERMS = [
+  'google', 'apple', 'instagram', 'tiktok', 'facebook',
+  'youtube', 'whatsapp', 'wechat'
+];
+
+const APPLE_CATEGORIES = [
+  'Business', 'DeveloperTools', 'Education', 'Entertainment',
+  'Finance', 'FoodAndDrink', 'Games', 'GraphicsAndDesign',
+  'HealthAndFitness', 'Kids', 'Lifestyle', 'MagazinesAndNewspapers',
+  'Medical', 'Music', 'Navigation', 'News', 'PhotoAndVideo',
+  'Productivity', 'Reference', 'Shopping', 'SocialNetworking',
+  'Sports', 'Stickers', 'Travel', 'Utilities', 'Weather'
+];
+
+const APPLE_LOCALES = [
+  'ar-SA', 'ca', 'cs', 'da', 'de-DE', 'el', 'en-AU', 'en-CA',
+  'en-GB', 'en-US', 'es-ES', 'es-MX', 'fi', 'fr-CA', 'fr-FR',
+  'he', 'hi', 'hr', 'hu', 'id', 'it', 'ja', 'ko', 'ms',
+  'nl-NL', 'no', 'pl', 'pt-BR', 'pt-PT', 'ro', 'ru', 'sk',
+  'sv', 'th', 'tr', 'uk', 'vi', 'zh-Hans', 'zh-Hant'
+];
+
 module.exports = {
   LIMITS,
   SCREENSHOT_LIMITS,
@@ -82,5 +106,9 @@ module.exports = {
   SCREENSHOT_CONSTRAINTS,
   VIDEO_CONSTRAINTS,
   REQUIRED_CONFIG_PATHS,
-  REQUIRED_LOCALE_METADATA_FIELDS
+  REQUIRED_LOCALE_METADATA_FIELDS,
+  DESCRIPTION_MIN_LENGTH,
+  COMPETITOR_TERMS,
+  APPLE_CATEGORIES,
+  APPLE_LOCALES
 };

@@ -1,31 +1,29 @@
 const path = require('path');
 const fs = require('fs-extra');
 const imageSize = require('image-size');
+const { execFile } = require('child_process');
 const {
   SCREENSHOT_RESOLUTIONS,
   SCREENSHOT_CONSTRAINTS,
   VIDEO_CONSTRAINTS,
   VALID_SCREENSHOT_SETS
 } = require('./schema');
+const { push } = require('../utils/reportHelper');
 
-function push(result, kind, code, message, details = {}) {
-  result[kind].push({ code, message, ...details });
-}
-
-function validateAssets(assets, screenshotCopy) {
+async function validateAssets(assets, screenshotCopy) {
   const result = { errors: [], warnings: [], passed: [] };
   const screenshotAssets = assets.screenshots || {};
   const videoAssets = assets.videos || {};
 
   for (const locale of Object.keys(screenshotAssets)) {
     for (const setName of Object.keys(screenshotAssets[locale])) {
-      validateScreenshotSet(result, locale, setName, screenshotAssets[locale][setName], screenshotCopy[locale]);
+      await validateScreenshotSet(result, locale, setName, screenshotAssets[locale][setName], screenshotCopy[locale]);
     }
   }
 
   for (const locale of Object.keys(videoAssets)) {
     for (const setName of Object.keys(videoAssets[locale])) {
-      validateVideoSet(result, locale, setName, videoAssets[locale][setName]);
+      await validateVideoSet(result, locale, setName, videoAssets[locale][setName]);
     }
   }
 
@@ -41,7 +39,7 @@ function validateAssets(assets, screenshotCopy) {
   return result;
 }
 
-function validateScreenshotSet(result, locale, setName, files, localeCopy) {
+async function validateScreenshotSet(result, locale, setName, files, localeCopy) {
   if (!VALID_SCREENSHOT_SETS.includes(setName)) {
     push(result, 'warnings', 'UNKNOWN_SCREENSHOT_SET_DIR', `${locale} assets/${locale}/${setName}/ is not a recognized device type.`, { locale, setName });
     return;
@@ -66,15 +64,15 @@ function validateScreenshotSet(result, locale, setName, files, localeCopy) {
   }
 
   for (const filePath of files) {
-    validateScreenshotFile(result, locale, setName, filePath);
+    await validateScreenshotFile(result, locale, setName, filePath);
   }
 }
 
-function validateScreenshotFile(result, locale, setName, filePath) {
+async function validateScreenshotFile(result, locale, setName, filePath) {
   const basename = path.basename(filePath);
 
   try {
-    const stat = fs.statSync(filePath);
+    const stat = await fs.stat(filePath);
     const sizeMB = stat.size / (1024 * 1024);
     if (sizeMB > SCREENSHOT_CONSTRAINTS.maxFileSizeMB) {
       push(result, 'warnings', 'SCREENSHOT_FILE_TOO_LARGE', `${locale} ${setName}/${basename}: ${sizeMB.toFixed(1)}MB exceeds recommended ${SCREENSHOT_CONSTRAINTS.maxFileSizeMB}MB.`, { locale, setName, filePath, sizeMB });
@@ -108,17 +106,17 @@ function validateScreenshotFile(result, locale, setName, filePath) {
   }
 }
 
-function validateVideoSet(result, locale, setName, files) {
+async function validateVideoSet(result, locale, setName, files) {
   if (files.length > VIDEO_CONSTRAINTS.maxCountPerSet) {
     push(result, 'errors', 'VIDEO_TOO_MANY', `${locale} previews/${setName}: ${files.length} videos; maximum is ${VIDEO_CONSTRAINTS.maxCountPerSet}.`, { locale, setName, count: files.length, limit: VIDEO_CONSTRAINTS.maxCountPerSet });
   }
 
   for (const filePath of files) {
-    validateVideoFile(result, locale, setName, filePath);
+    await validateVideoFile(result, locale, setName, filePath);
   }
 }
 
-function validateVideoFile(result, locale, setName, filePath) {
+async function validateVideoFile(result, locale, setName, filePath) {
   const basename = path.basename(filePath);
   const ext = path.extname(filePath).toLowerCase();
 
@@ -129,7 +127,7 @@ function validateVideoFile(result, locale, setName, filePath) {
   push(result, 'passed', 'VIDEO_FORMAT_OK', `${locale} previews/${basename}: format is valid.`, { locale, setName, filePath });
 
   try {
-    const stat = fs.statSync(filePath);
+    const stat = await fs.stat(filePath);
     const sizeMB = stat.size / (1024 * 1024);
     if (sizeMB > VIDEO_CONSTRAINTS.maxFileSizeMB) {
       push(result, 'errors', 'VIDEO_FILE_TOO_LARGE', `${locale} previews/${basename}: ${sizeMB.toFixed(1)}MB exceeds ${VIDEO_CONSTRAINTS.maxFileSizeMB}MB.`, { locale, setName, filePath, sizeMB });
@@ -141,13 +139,17 @@ function validateVideoFile(result, locale, setName, filePath) {
   }
 
   try {
-    const { execFileSync } = require('child_process');
-    const output = execFileSync('ffprobe', [
-      '-v', 'quiet',
-      '-print_format', 'json',
-      '-show_format',
-      filePath
-    ], { timeout: 10000 }).toString();
+    const output = await new Promise((resolve, reject) => {
+      execFile('ffprobe', [
+        '-v', 'quiet',
+        '-print_format', 'json',
+        '-show_format',
+        filePath
+      ], { timeout: 10000 }, (err, stdout) => {
+        if (err) reject(err);
+        else resolve(stdout);
+      });
+    });
     const info = JSON.parse(output);
     const duration = parseFloat(info?.format?.duration || 0);
     if (duration < VIDEO_CONSTRAINTS.minDurationSec) {

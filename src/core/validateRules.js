@@ -1,8 +1,9 @@
 const path = require('path');
 const utf8ByteLength = require('./byteLength');
-const { LIMITS, SCREENSHOT_LIMITS, VALID_PLATFORMS, VALID_SCREENSHOT_SETS, REQUIRED_CONFIG_PATHS, REQUIRED_LOCALE_METADATA_FIELDS } = require('./schema');
+const { LIMITS, SCREENSHOT_LIMITS, VALID_PLATFORMS, VALID_SCREENSHOT_SETS, REQUIRED_CONFIG_PATHS, REQUIRED_LOCALE_METADATA_FIELDS, DESCRIPTION_MIN_LENGTH, COMPETITOR_TERMS, APPLE_CATEGORIES } = require('./schema');
 const { getLocaleUrl } = require('./loadMetadata');
 const { validateAssets } = require('./assetValidator');
+const { push } = require('../utils/reportHelper');
 
 function get(obj, dotted) {
   return dotted.split('.').reduce((current, key) => current == null ? undefined : current[key], obj);
@@ -14,10 +15,6 @@ function isBlank(value) {
 
 function isHttpUrl(value) {
   return /^https?:\/\//i.test(String(value || '').trim());
-}
-
-function push(result, kind, code, message, details = {}) {
-  result[kind].push({ code, message, ...details });
 }
 
 function checkCharMax(result, locale, field, value, max) {
@@ -38,7 +35,7 @@ function checkByteMax(result, locale, field, value, max) {
   }
 }
 
-function validateMetadata(metadata) {
+async function validateMetadata(metadata) {
   const result = { ok: true, errors: [], warnings: [], passed: [] };
   const config = metadata.config || {};
   const configuredLocales = metadata.configuredLocales || [];
@@ -99,7 +96,7 @@ function validateMetadata(metadata) {
     checkCharMax(result, locale, 'metadata.promotional_text', m.promotional_text, LIMITS.promotional_text.max);
     checkCharMax(result, locale, 'metadata.description', m.description, LIMITS.description.max);
     const descLength = String(m.description || '').length;
-    if (descLength > 0 && descLength < 10) {
+    if (descLength > 0 && descLength < DESCRIPTION_MIN_LENGTH) {
       push(result, 'warnings', 'DESCRIPTION_TOO_SHORT', `${locale} metadata.description is only ${descLength} characters. Consider writing a longer description.`, { locale, field: 'metadata.description', count: descLength });
     }
     checkByteMax(result, locale, 'metadata.keywords', m.keywords, LIMITS.keywords.max);
@@ -134,8 +131,7 @@ function validateMetadata(metadata) {
     const suspicious = [];
     if (appName && keywords.includes(appName)) suspicious.push('app name');
     if (companyName && keywords.includes(companyName)) suspicious.push('company name');
-    const competitorTerms = ['google', 'apple', 'instagram', 'tiktok', 'facebook', 'youtube', 'whatsapp', 'wechat'];
-    for (const term of competitorTerms) {
+    for (const term of COMPETITOR_TERMS) {
       if (keywords.includes(term)) suspicious.push(`possible competitor term: ${term}`);
     }
     if (suspicious.length) {
@@ -169,6 +165,34 @@ function validateMetadata(metadata) {
     push(result, 'warnings', 'APPLE_ID_FORMAT', `app.apple_id "${appleId}" does not look like a numeric Apple ID.`, { field: 'app.apple_id', value: appleId });
   }
 
+  const primaryCategory = config?.store?.primary_category;
+  if (primaryCategory && !APPLE_CATEGORIES.includes(primaryCategory)) {
+    push(result, 'errors', 'INVALID_PRIMARY_CATEGORY', `store.primary_category "${primaryCategory}" is not a valid App Store category.`, { field: 'store.primary_category', value: primaryCategory });
+  }
+
+  const secondaryCategory = config?.store?.secondary_category;
+  if (secondaryCategory && !APPLE_CATEGORIES.includes(secondaryCategory)) {
+    push(result, 'errors', 'INVALID_SECONDARY_CATEGORY', `store.secondary_category "${secondaryCategory}" is not a valid App Store category.`, { field: 'store.secondary_category', value: secondaryCategory });
+  }
+
+  const version = config?.app?.version;
+  if (version && !/^\d+\.\d+(\.\d+)?$/.test(String(version).trim())) {
+    push(result, 'warnings', 'VERSION_FORMAT', `app.version "${version}" does not follow semver format (e.g. 1.0.0).`, { field: 'app.version', value: version });
+  }
+
+  const bundleId = config?.app?.bundle_id;
+  if (bundleId && !/^[a-zA-Z0-9]([a-zA-Z0-9-]*[a-zA-Z0-9])?(\.[a-zA-Z0-9]([a-zA-Z0-9-]*[a-zA-Z0-9])?)+$/.test(String(bundleId).trim())) {
+    push(result, 'warnings', 'BUNDLE_ID_FORMAT', `app.bundle_id "${bundleId}" does not follow reverse-domain format (e.g. com.example.app).`, { field: 'app.bundle_id', value: bundleId });
+  }
+
+  const seenLocales = new Set();
+  for (const loc of configuredLocales) {
+    if (seenLocales.has(loc)) {
+      push(result, 'errors', 'DUPLICATE_LOCALE', `store.locales contains duplicate "${loc}".`, { field: 'store.locales', locale: loc });
+    }
+    seenLocales.add(loc);
+  }
+
   for (const locale of configuredLocales) {
     const screenshotData = metadata.screenshots[locale];
     if (!screenshotData) continue;
@@ -193,7 +217,7 @@ function validateMetadata(metadata) {
   }
 
   if (metadata.assets) {
-    const assetResult = validateAssets(metadata.assets, metadata.screenshots);
+    const assetResult = await validateAssets(metadata.assets, metadata.screenshots);
     result.errors.push(...assetResult.errors);
     result.warnings.push(...assetResult.warnings);
     result.passed.push(...assetResult.passed);

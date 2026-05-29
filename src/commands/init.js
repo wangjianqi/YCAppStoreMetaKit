@@ -4,6 +4,8 @@ const yaml = require('js-yaml');
 const { templatesDir, metadataDir } = require('../core/paths');
 const { copyFileIfAbsent, writeFileIfAbsent, relativeFromCwd } = require('../utils/fs');
 const logger = require('../utils/logger');
+const { localeYaml, screenshotYaml } = require('../core/localeTemplate');
+const { APPLE_LOCALES } = require('../core/schema');
 
 function projectReadme() {
   return `# AppStoreMetadata
@@ -43,36 +45,6 @@ Edit source files only. Do not manually edit files under generated/.
 `;
 }
 
-function localeYaml(locale) {
-  return `locale: "${locale}"
-
-metadata:
-  name: ""
-  subtitle: ""
-  promotional_text: ""
-  description: ""
-  keywords: ""
-  whats_new: ""
-
-review:
-  notes: ""
-
-compliance:
-  privacy_summary: ""
-  demo_content_notice: ""
-`;
-}
-
-function screenshotYaml(locale) {
-  return `locale: "${locale}"
-
-sets:
-  iphone_6_9:
-    - title: ""
-      subtitle: ""
-`;
-}
-
 async function init(options = {}) {
   const force = !!options.force;
   const root = process.cwd();
@@ -83,6 +55,13 @@ async function init(options = {}) {
   const localeList = options.locales
     ? options.locales.split(',').map(l => l.trim()).filter(Boolean)
     : ['en-US', 'zh-Hans'];
+
+  const invalidLocales = localeList.filter(l => !APPLE_LOCALES.includes(l));
+  if (invalidLocales.length) {
+    const err = new Error(`Invalid locale code(s): ${invalidLocales.join(', ')}. Valid locales: ${APPLE_LOCALES.join(', ')}`);
+    err.exitCode = 1;
+    throw err;
+  }
 
   const builtinLocales = ['en-US', 'zh-Hans'];
   const tasks = [];

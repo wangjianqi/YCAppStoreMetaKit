@@ -6,7 +6,7 @@ const { pathToFileURL } = require('url');
 const open = require('open');
 
 async function openGenerated() {
-  requireMetadataDir(process.cwd());
+  await requireMetadataDir(process.cwd());
   const htmlPath = path.join(generatedDir(process.cwd()), 'index.html');
   if (!await fs.pathExists(htmlPath)) {
     const err = new Error('generated/index.html not found. Run `ycmeta build` or `ycmeta p` first.');

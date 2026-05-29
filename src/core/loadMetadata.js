@@ -17,7 +17,7 @@ async function loadYamlFile(filePath) {
 }
 
 async function loadMetadata(root = process.cwd()) {
-  const dir = requireMetadataDir(root);
+  const dir = await requireMetadataDir(root);
   const configPath = path.join(dir, 'appstore.config.yaml');
   if (!await fs.pathExists(configPath)) {
     const err = new Error('AppStoreMetadata/appstore.config.yaml not found. Run `ycmeta init` first.');

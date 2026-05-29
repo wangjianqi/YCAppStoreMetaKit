@@ -4,6 +4,8 @@ const yaml = require('js-yaml');
 const { requireMetadataDir } = require('../core/paths');
 const { writeFileIfAbsent, relativeFromCwd } = require('../utils/fs');
 const logger = require('../utils/logger');
+const { localeYamlFromSource, screenshotYamlFromSource, localeYaml, screenshotYaml } = require('../core/localeTemplate');
+const { APPLE_LOCALES } = require('../core/schema');
 
 async function addLocale(locale, options = {}) {
   if (!locale) {
@@ -12,8 +14,14 @@ async function addLocale(locale, options = {}) {
     throw err;
   }
 
+  if (!APPLE_LOCALES.includes(locale)) {
+    const err = new Error(`"${locale}" is not a recognized Apple locale code. Valid locales: ${APPLE_LOCALES.join(', ')}`);
+    err.exitCode = 1;
+    throw err;
+  }
+
   const force = !!options.force;
-  const dir = requireMetadataDir(process.cwd());
+  const dir = await requireMetadataDir(process.cwd());
   const configPath = path.join(dir, 'appstore.config.yaml');
   const configText = await fs.readFile(configPath, 'utf8');
   const config = yaml.load(configText) || {};
@@ -28,22 +36,16 @@ async function addLocale(locale, options = {}) {
   const sourceLocalePath = path.join(dir, 'locales', `${defaultLocale}.yaml`);
   const sourceScreenshotPath = path.join(dir, 'screenshots', `${defaultLocale}.yaml`);
 
-  let localeTemplate = `locale: "${locale}"\n\nmetadata:\n  name: ""\n  subtitle: ""\n  promotional_text: ""\n  description: ""\n  keywords: ""\n  whats_new: ""\n\nreview:\n  notes: ""\n\ncompliance:\n  privacy_summary: ""\n  demo_content_notice: ""\n`;
+  let localeTemplate = localeYaml(locale);
   if (await fs.pathExists(sourceLocalePath)) {
     const sourceData = yaml.load(await fs.readFile(sourceLocalePath, 'utf8')) || {};
-    const m = sourceData.metadata || {};
-    localeTemplate = `locale: "${locale}"\n\nmetadata:\n  name: "${m.name || ''}"\n  subtitle: ""\n  promotional_text: ""\n  description: ""\n  keywords: ""\n  whats_new: ""\n\nreview:\n  notes: ""\n\ncompliance:\n  privacy_summary: ""\n  demo_content_notice: ""\n`;
+    localeTemplate = localeYamlFromSource(locale, sourceData);
   }
 
-  let screenshotTemplate = `locale: "${locale}"\n\nsets:\n  iphone_6_9:\n    - title: ""\n      subtitle: ""\n`;
+  let screenshotTemplate = screenshotYaml(locale);
   if (await fs.pathExists(sourceScreenshotPath)) {
     const sourceData = yaml.load(await fs.readFile(sourceScreenshotPath, 'utf8')) || {};
-    const sets = sourceData.sets || {};
-    const setEntries = Object.entries(sets).map(([setName, items]) => {
-      const rows = (items || []).map(() => `    - title: ""\n      subtitle: ""`).join('\n');
-      return `  ${setName}:\n${rows}`;
-    }).join('\n');
-    screenshotTemplate = `locale: "${locale}"\n\nsets:\n${setEntries}\n`;
+    screenshotTemplate = screenshotYamlFromSource(locale, sourceData);
   }
 
   config.store.locales = [...locales, locale];

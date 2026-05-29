@@ -1,29 +1,6 @@
 const { loadMetadata } = require('../core/loadMetadata');
 const { validateMetadata } = require('../core/validateRules');
-const logger = require('../utils/logger');
-
-function printReport(report) {
-  logger.plain('YCAppStoreMetaKit Check');
-  logger.plain('');
-  logger.plain(`Errors: ${report.summary.errorCount}`);
-  logger.plain(`Warnings: ${report.summary.warningCount}`);
-  logger.plain(`Passed: ${report.summary.passedCount}`);
-  logger.plain('');
-
-  if (report.errors.length) {
-    logger.error('Errors');
-    report.errors.forEach((item) => logger.plain(`- ${item.message}`));
-    logger.plain('');
-  }
-  if (report.warnings.length) {
-    logger.warn('Warnings');
-    report.warnings.forEach((item) => logger.plain(`- ${item.message}`));
-    logger.plain('');
-  }
-  if (!report.errors.length) {
-    logger.success('Check completed. No blocking errors.');
-  }
-}
+const { printReport } = require('../utils/reportPrinter');
 
 function filterReport(report, locale) {
   if (!locale) return report;
@@ -46,7 +23,7 @@ function filterReport(report, locale) {
 
 async function runCheck(options = {}) {
   const metadata = await loadMetadata(process.cwd());
-  const fullReport = validateMetadata(metadata);
+  const fullReport = await validateMetadata(metadata);
   const report = filterReport(fullReport, options.locale);
   if (options.json) {
     process.stdout.write(JSON.stringify(report, null, 2) + '\n');
@@ -54,10 +31,11 @@ async function runCheck(options = {}) {
     printReport(report);
   }
   if (!report.ok) {
-    process.exitCode = 1;
+    const err = new Error('Validation failed');
+    err.exitCode = 1;
+    throw err;
   }
   return report;
 }
 
 module.exports = runCheck;
-module.exports.printReport = printReport;
