@@ -397,7 +397,7 @@ function render() {
     $('appMeta').innerHTML = 'Bundle ID: ' + escapeHTML(DATA.app.bundle_id || '') + '<br>SKU: ' + escapeHTML(DATA.app.sku || '') + '<br>Version: ' + escapeHTML(DATA.app.version || '') + '<br>Locale: ' + escapeHTML(locale);
     $('generatedAt').textContent = 'Generated: ' + DATA.generatedAt;
     $('appInfo').innerHTML = [
-      ['Internal Name', DATA.app.internal_name], ['App Store Name', DATA.app.app_store_name], ['Bundle ID', DATA.app.bundle_id], ['SKU', DATA.app.sku], ['Apple ID', DATA.app.apple_id], ['Version', DATA.app.version], ['Platform', DATA.app.platform], ['Primary Category', DATA.store.primary_category], ['Secondary Category', DATA.store.secondary_category], ['Company', DATA.company.name], ['Copyright', DATA.company.copyright]
+      ['Internal Name', DATA.app.internal_name], ['App Store Name', DATA.app.app_store_name], ['Bundle ID', DATA.app.bundle_id], ['SKU', DATA.app.sku], ['Apple ID', DATA.app.apple_id], ['Version', DATA.app.version], ['Platform', DATA.app.platform], ['Support Email', DATA.app.support_email], ['Primary Category', DATA.store.primary_category], ['Secondary Category', DATA.store.secondary_category], ['Company', DATA.company.name], ['Copyright', DATA.company.copyright]
     ].map(([k,v]) => '<div>' + escapeHTML(k) + '</div><div>' + escapeHTML(v) + '</div>').join('');
 
     $('versionGrid').innerHTML = [
@@ -498,6 +498,7 @@ function render() {
       + '<div class="asp-meta-row"><span class="label">Category</span><span class="val">' + escapeHTML(DATA.store.primary_category || '') + '</span></div>'
       + '<div class="asp-meta-row"><span class="label">Languages</span><span class="val">' + escapeHTML(DATA.localeOrder.join(', ')) + '</span></div>'
       + '<div class="asp-meta-row"><span class="label">Developer</span><span class="val">' + escapeHTML(DATA.company.name || '') + '</span></div>'
+      + (DATA.app.support_email ? '<div class="asp-meta-row"><span class="label">Support Email</span><span class="val"><a href="mailto:' + escapeHTML(DATA.app.support_email) + '">' + escapeHTML(DATA.app.support_email) + '</a></span></div>' : '')
       + '<div class="asp-meta-row"><span class="label">Age Rating</span><span class="val">' + escapeHTML(DATA.features?.age_rating || 'Not set') + '</span></div>'
       + '</div></div>';
 

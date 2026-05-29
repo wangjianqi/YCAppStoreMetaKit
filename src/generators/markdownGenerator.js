@@ -20,6 +20,7 @@ function generateMarkdown(metadata) {
   lines.push(`- Apple ID: ${config?.app?.apple_id || ''}`);
   lines.push(`- Version: ${config?.app?.version || ''}`);
   lines.push(`- Platform: ${config?.app?.platform || ''}`);
+  if (config?.app?.support_email) lines.push(`- Support Email: ${config.app.support_email}`);
   lines.push(`- Primary Category: ${config?.store?.primary_category || ''}`);
   lines.push(`- Secondary Category: ${config?.store?.secondary_category || ''}`);
 

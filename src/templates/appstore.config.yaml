@@ -6,6 +6,7 @@ app:
   apple_id: ""
   version: "1.0.0"
   platform: "ios"
+  support_email: ""
 
 company:
   name: "Henan Yuechuan Intelligent Technology Co., Ltd."
