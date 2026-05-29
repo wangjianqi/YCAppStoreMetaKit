@@ -487,7 +487,7 @@ function render() {
       + '<details><summary>Passed checks (' + localePassed.length + ')</summary><ul class="report">' + localePassed.map(x => '<li>' + escapeHTML(x.message) + '</li>').join('') + '</ul></details>'
       + '</div>';
 
-    $('fastlaneGrid').innerHTML = '<div class="card full"><div class="value">AppStoreMetadata/generated/fastlane/metadata/' + escapeHTML(locale) + '/<br>- name.txt<br>- subtitle.txt<br>- promotional_text.txt<br>- description.txt<br>- keywords.txt<br>- release_notes.txt<br>- support_url.txt<br>- marketing_url.txt<br>- privacy_url.txt</div></div>';
+    $('fastlaneGrid').innerHTML = '<div class="card full"><div class="value">AppStoreMetadata/generated/fastlane/metadata/' + escapeHTML(locale) + '/<br>- name.txt<br>- subtitle.txt<br>- promotional_text.txt<br>- description.txt<br>- keywords.txt<br>- release_notes.txt<br>- support_url.txt<br>- marketing_url.txt<br>- privacy_url.txt' + (DATA.app.support_email ? '<br>- support_email.txt' : '') + '</div></div>';
 
     $('appstorePreviewBody').innerHTML = '<div class="appstore-preview">'
       + '<div class="asp-header"><div class="asp-icon">' + escapeHTML((DATA.app.app_store_name || 'A')[0]) + '</div><div class="asp-info"><div class="asp-name">' + escapeHTML(m.name || DATA.app.app_store_name) + '</div><div class="asp-subtitle">' + escapeHTML(m.subtitle || '') + '</div><div class="asp-btn">OPEN</div></div></div>'

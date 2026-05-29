@@ -185,6 +185,11 @@ async function validateMetadata(metadata) {
     push(result, 'warnings', 'BUNDLE_ID_FORMAT', `app.bundle_id "${bundleId}" does not follow reverse-domain format (e.g. com.example.app).`, { field: 'app.bundle_id', value: bundleId });
   }
 
+  const supportEmail = config?.app?.support_email;
+  if (supportEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(supportEmail).trim())) {
+    push(result, 'warnings', 'SUPPORT_EMAIL_FORMAT', `app.support_email "${supportEmail}" does not look like a valid email address.`, { field: 'app.support_email', value: supportEmail });
+  }
+
   const seenLocales = new Set();
   for (const loc of configuredLocales) {
     if (seenLocales.has(loc)) {

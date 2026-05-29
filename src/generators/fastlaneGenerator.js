@@ -39,6 +39,9 @@ async function generateFastlane(metadata) {
       'marketing_url.txt': getLocaleUrl(metadata.config, 'marketing', locale),
       'privacy_url.txt': getLocaleUrl(metadata.config, 'privacy', locale)
     };
+    if (metadata.config?.app?.support_email) {
+      files['support_email.txt'] = metadata.config.app.support_email;
+    }
     for (const [name, value] of Object.entries(files)) {
       const target = path.join(dir, name);
       await write(target, value);
